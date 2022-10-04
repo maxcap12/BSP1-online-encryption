@@ -1,0 +1,191 @@
+* {
+    padding: 0;
+    margin: 0;
+    font-family: basicFont, sans-serif;
+}
+
+@font-face {
+    font-family: basicFont, sans-serif;
+    src: url("static/Bw Modelica/otf/BwModelica-Black.otf");
+}
+
+@font-face {
+    font-family: basicFontBold, sans-serif;
+    src: url("static/Bw Modelica/otf/BwModelica-Bold.otf");
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black;
+    padding: .5rem min(1.5rem, 10%) .5rem min(5%, .5rem);
+}
+
+.logo {
+    height: 2.5em;
+    width: 4em;
+}
+
+.connection-field {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 1rem;
+    width: 40%;
+}
+
+.connect-btn {
+    height: 2rem;
+    width: min(100%, 8rem);
+    min-width: 3.5rem;
+    font-size: small;
+}
+
+.input-field {
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: transparent;
+}
+
+.content {
+    padding-inline: 5%;
+    padding-top: min(7%, 3rem);
+}
+
+a {
+    color: blue;
+}
+
+.motto-container {
+    max-width: 600px;
+}
+
+.motto {
+    font-size: min(7vw, 45px);
+    padding-bottom: min(3rem, 5%);
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10%;
+}
+
+.small-btn {
+    width: 45%;
+}
+
+.medium-btn {
+    width: 100%;
+}
+
+.big-btn {
+    width: 100%;
+}
+
+.label {
+    font-size: min(2.5vw, 90%);
+}
+
+.form-input {
+    margin-bottom: 1.5rem;
+    height: 3rem;
+    min-width: 100%;
+    text-align: center;
+}
+
+::placeholder {
+    text-align: center;
+}
+
+#file-input::file-selector-button {
+    display: none;
+}
+
+#file-input {
+    line-height: 50px;
+}
+
+.info-text {
+    margin-bottom: 1rem;
+    max-font-size: 3vh;
+    margin-top: 10vh;
+}
+
+
+.title {
+    text-align: center;
+    font-size: max(10vw, 30px);
+    padding-bottom: min(5rem, 20%);
+    padding-top: 1rem;
+}
+
+#username, #pw {
+    margin-bottom: 3rem !important;
+}
+
+.log-label {
+    font-size: min(4vw, 100%)
+}
+
+.sign-btn {
+    width: 50vw;
+    margin-bottom: 1.5rem;
+    margin-inline: auto;
+    height: 3rem;
+    text-align: center;
+}
+
+.sign-label {
+    margin-top: 1vh;
+    font-size: min(3vw, 100%);
+    margin-inline: auto;
+}
+
+@media (min-width: 800px) {
+    .logo {
+        height: 4em;
+        width: 7em;
+    }
+
+    .form-input {
+        height: 4rem;
+    }
+
+    #file-input {
+        line-height: 65px;
+    }
+
+    .connect-btn {
+        height: 3rem;
+        width: 10rem;
+        min-width: 3.5rem;
+        font-size: medium;
+    }
+
+    .form {
+        gap: 5%;
+        justify-content: center;
+    }
+
+    .small-btn {
+        width: 25%;
+    }
+
+    .medium-btn {
+        width: 40%;
+    }
+
+    .big-btn {
+        width: 70%;
+    }
+
+    .form-input {
+        margin-bottom: 5vh;
+        font-size: large;
+    }
+}
