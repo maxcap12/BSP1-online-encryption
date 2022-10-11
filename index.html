@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Online encryption</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
     <div class="navbar">
-        <img class="logo" src="static/logo1-black.png" alt="Online encryption">
+        <img class="logo" src="../static/logo1-black.png" alt="Online encryption">
 
         <div class="connection-field">
-            <!-- {% if signin == True %} -->
-            <button type="button" class="input-field connect-btn">Sign in</button>
-            <button type="button" class="input-field connect-btn">Sign up</button>
-            <!--
-            {% else %}
-            <button type="button" class="input-field connect-btn">Log out</button>
-            -->
+            {% if signin == False %}
+                <a href="/sign_in">
+                    <button type="button" class="input-field connect-btn">Sign in</button>
+                </a>
+                <a href="/sign_up">
+                    <button type="button" class="input-field connect-btn">Sign up</button>
+                </a>
+            {% elif signin == True %}
+                <a href="/log_out">
+                    <button type="button" class="input-field connect-btn">Log out</button>
+                </a>
+            {% endif %}
         </div>
     </div>
     <div class="content">
@@ -24,16 +29,16 @@
             <div class="motto">Protect all your documents, and for free !</div>
         </div>
 
-        <form method="post" class="form">
+        <form method="POST" class="form" enctype="multipart/form-data" action="http://127.0.0.1:5000/upload">
 
             <div class="big-btn">
                 <label class="label" for="file-input">1st step: select a file or a folder</label>
-                <input type="file" class="input-field form-input" id="file-input" required>
+                <input type="file" class="input-field form-input" id="file-input" name="file" required>
             </div>
 
             <div class="small-btn">
                 <label class="label" for="action-input">2nd step: select the action</label>
-                <select id="action-input" class="input-field form-input" required>
+                <select id="action-input" class="input-field form-input" name="action" required>
                     <option value="none" selected> -- </option>
                     <option value="encrypt">Encrypt</option>
                     <option value="decrypt">Decrypt</option>
@@ -42,16 +47,17 @@
 
             <div class="small-btn">
                 <label class="label"  for="method-input">3rd step: select the method</label>
-                <select id="method-input" class="input-field form-input" required>
+                <select id="method-input" class="input-field form-input" name="method" required>
                     <option value="none" selected> -- </option>
-                    <option value="aes">AES</option>
+                    <option value="aes128">AES 128</option>
+                    <option value="cesar">Cesar</option>
                 </select>
             </div>
 
             <div class="medium-btn">
-                <label class="label" for="key-input">4th step: enter your key or <a>generate one</a></label>
+                <label class="label" for="key-input">4th step: enter your key or <a style="color: blue">generate one</a></label>
                 <input type="text" id="key-input" class="input-field form-input" placeholder="type your key here"
-                       required>
+                       name="key" required>
             </div>
 
             <div class="small-btn">
@@ -66,7 +72,8 @@
         </form>
 
         <div class="end">
-            <p class="info-text">For more information, take a look at our <a>information page</a></p>
+            <p class="info-text">For more information, take a look at our
+                <a href="/information_page" style="color: blue">information page</a></p>
         </div>
     </div>
 </body>

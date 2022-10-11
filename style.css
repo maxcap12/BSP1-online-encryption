@@ -1,24 +1,40 @@
 * {
+    --primaryColor: #33D1FF;
+    --primaryColor60: rgba(51, 209, 255, 0.5);
+    --secondaryColor: #26FF71;
+    --tertiaryColor: #265AFF;
+    --black100: #0E262D;
+    --black75: rgba(14, 38, 45, 0.75);
     padding: 0;
     margin: 0;
     font-family: basicFont, sans-serif;
+    color: var(--black100);
 }
 
 @font-face {
     font-family: basicFont, sans-serif;
-    src: url("static/Bw Modelica/otf/BwModelica-Black.otf");
+    src: url("../static/Bw Modelica/otf/BwModelica-Black.otf");
 }
 
 @font-face {
     font-family: basicFontBold, sans-serif;
-    src: url("static/Bw Modelica/otf/BwModelica-Bold.otf");
+    src: url("../static/Bw Modelica/otf/BwModelica-Bold.otf");
+}
+
+body {
+    min-height: 100vh;
+    min-width: 100vw;
+    background: linear-gradient(20deg, var(--primaryColor), var(--secondaryColor));
+    background-size: 300% 100%;
+    animation: gradientMovement 20s ease infinite;
+    -moz-animation: gradientMovement 20s ease infinite;
+    -webkit-animation: gradientMovement 20s ease infinite;
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid black;
     padding: .5rem min(1.5rem, 10%) .5rem min(5%, .5rem);
 }
 
@@ -43,7 +59,7 @@
 }
 
 .input-field {
-    border: 1px solid black;
+    border: 1px solid var(--black75);
     border-radius: 5px;
     background-color: transparent;
 }
@@ -51,10 +67,6 @@
 .content {
     padding-inline: 5%;
     padding-top: min(7%, 3rem);
-}
-
-a {
-    color: blue;
 }
 
 .motto-container {
@@ -99,11 +111,21 @@ a {
 }
 
 ::placeholder {
-    text-align: center;
+    margin-inline: auto;
+    color: var(--black75);
+}
+
+::-webkit-input-placeholder {
+    margin-inline: auto;
+    color: var(--black75);
 }
 
 #file-input::file-selector-button {
     display: none;
+}
+
+#file-input::-webkit-textfield-decoration-container {
+    margin-inline: auto;
 }
 
 #file-input {
@@ -119,9 +141,9 @@ a {
 
 .title {
     text-align: center;
-    font-size: max(10vw, 30px);
-    padding-bottom: min(5rem, 20%);
-    padding-top: 1rem;
+    font-size: min(10vw, 80px);
+    padding-bottom: min(5vh, 20%);
+    padding-top: 0;
 }
 
 #username, #pw {
@@ -142,8 +164,28 @@ a {
 
 .sign-label {
     margin-top: 1vh;
-    font-size: min(3vw, 100%);
+    font-size: min(3vw, 80%);
     margin-inline: auto;
+}
+
+.sign-btn-big {
+    width: min(100%, 800px);
+}
+
+.sign-btn-small {
+    width: min(50%, 300px);
+    font-size: large;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+a {
+    text-underline: none;
 }
 
 @media (min-width: 800px) {
@@ -187,5 +229,47 @@ a {
     .form-input {
         margin-bottom: 5vh;
         font-size: large;
+    }
+}
+
+@keyframes gradientMovement {
+    0% {
+        background-position: 0 60%;
+    }
+
+    50% {
+        background-position: 100% 60%;
+    }
+
+    100% {
+        background-position: 0 60%;
+    }
+}
+
+@-moz-keyframes gradientMovement {
+    0% {
+        background-position: 0 60%;
+    }
+
+    50% {
+        background-position: 100% 60%;
+    }
+
+    100% {
+        background-position: 0 60%;
+    }
+}
+
+@-webkit-keyframes gradientMovement {
+    0% {
+        background-position: 0 60%;
+    }
+
+    50% {
+        background-position: 100% 60%;
+    }
+
+    100% {
+        background-position: 0 60%;
     }
 }
