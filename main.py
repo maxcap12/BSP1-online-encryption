@@ -1,5 +1,5 @@
 from __future__ import annotations
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, session
 from werkzeug.utils import secure_filename
 import os
 from crypto import crypto, check_key
@@ -18,19 +18,33 @@ app.config["UPLOAD_FOLDER"] = upload_path
 # set the maximum size for uploaded files
 app.config["MAX_CONTENT_LENGTH"] = max_size
 
+app.secret_key = "TEST"
+
+app.config["Session_permanent"] = False
+
 # create the folder to save the uploaded files if it doesn't exist
 if not os.path.exists(upload_path):
     os.mkdir(upload_path)
 
 
 @app.route("/")
-def index(errors: list = None) -> str:
+def index() -> str:
     """
     display the index page of the website
-    :param errors: list of strings representing the errors of input if any
     :return: index page
     """
-    return render_template("index.html", error_messages=errors)
+    error = []
+    filled = False
+    if "error" in session:
+        error = session["error"]
+        session.pop("error")
+
+    if "filled" in session:
+        filled = session["filled"]
+        session.pop("filled")
+
+    print(filled)
+    return render_template("index.html", error_messages=error, is_filled=filled)
 
 
 @app.route("/log_out")
@@ -39,7 +53,7 @@ def log_out() -> Response:
     log out the user
     :return: index page
     """
-    return redirect(url_for("index", signin=False))
+    return redirect(url_for("index"))
 
 
 @app.route("/sign_in", methods=["POST", "GET"])
@@ -54,7 +68,7 @@ def sign_in_page() -> str | Response:
         idt = request.form["id"]
         # get the password
         pw = request.form["pw"]
-        return redirect(url_for("index", signin=True))
+        return redirect(url_for("index"))
 
     return render_template("sign-in.html")
 
@@ -71,7 +85,7 @@ def sign_up() -> str | Response:
         idt = request.form["id"]
         # get the password
         pw = request.form["pw"]
-        return redirect(url_for("index", signin=True))
+        return redirect(url_for("index"))
 
     return render_template("sign-up.html")
 
@@ -96,6 +110,7 @@ def upload() -> Response:
 
     # check if the user posted information
     if request.method == "POST":
+        session["filled"] = True
         # get the key
         key = request.form["key"]
         # get the encryption method
@@ -103,8 +118,9 @@ def upload() -> Response:
 
         # check if the key is valid
         if not check_key(method, key):
+            session["error"] = "keyError"
             # if it's not, the user is back on the index page with an error message
-            return redirect(url_for("index", error="keyError"))
+            return redirect(url_for("index"))
 
         # get the action (encrypt or decrypt)
         action = request.form["action"]
@@ -124,6 +140,7 @@ def upload() -> Response:
 
         # delete the orignal file from the server
         os.remove(os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename)))
+        return redirect(url_for("index"))
 
     return redirect(url_for("index"))
 
@@ -136,6 +153,11 @@ def download() -> Responce:
     """
     # get access to the global variable new_file_name
     global new_file_name
+
+    if not new_file_name:
+        # if the variable file name is empty the user is redirected to the main page
+        return redirect(url_for("index"))
+
     # variable containing the new file downloader
     download_file = send_file(app.config["UPLOAD_FOLDER"] + '/' + new_file_name, as_attachment=True)
     # delete the ew file from the server
