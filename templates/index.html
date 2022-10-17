@@ -34,49 +34,68 @@
         <form method="POST" class="form" enctype="multipart/form-data" action="http://127.0.0.1:5000/upload">
 
             <div class="big-btn">
-                <label class="label" for="file-input">1st step: select a file or a folder</label>
-                <input type="file" class="input-field form-input" id="file-input" name="file" accept="text/plain" required>
+                <div {% if not is_filled %} class="animation" {% endif %}>
+                    <label class="label" for="file-input">1st step: select a file or a folder</label>
+                    <input onchange="appear('action-field')" type="file" class="input-field form-input" id="file-input" name="file" accept="text/plain" required>
+                </div>
             </div>
 
             <div class="small-btn">
-                <label class="label" for="action-input">2nd step: select the action</label>
-                <select id="action-input" class="input-field form-input" name="action" required>
-                    <option value="none" selected> -- </option>
-                    <option value="encrypt">Encrypt</option>
-                    <option value="decrypt">Decrypt</option>
-                </select>
+                <div id="action-field" {% if not is_filled %} class="hidden" {% endif %}>
+                    <label class="label" for="action-input">2nd step: select the action</label>
+                    <select onchange="appear('method-field')" id="action-input" class="input-field form-input" name="action" required>
+                        <option value="none" disabled selected> -- </option>
+                        <option value="encrypt">Encrypt</option>
+                        <option value="decrypt">Decrypt</option>
+                    </select>
+                </div>
             </div>
 
             <div class="small-btn">
-                <label class="label"  for="method-input">3rd step: select the method</label>
-                <select id="method-input" class="input-field form-input" name="method" required>
-                    <option value="none" selected> -- </option>
-                    <option value="aes128">AES 128</option>
-                    <option value="cesar">Cesar</option>
-                </select>
+                <div id="method-field" {% if not is_filled %} class="hidden" {% endif %}>
+                    <label class="label"  for="method-input">3rd step: select the method</label>
+                    <select onchange="appear('key-field')" id="method-input" class="input-field form-input" name="method" required>
+                        <option value="none" disabled selected> -- </option>
+                        <option value="aes128">AES 128</option>
+                        <option value="cesar">Cesar</option>
+                    </select>
+                </div>
             </div>
 
             <div class="medium-btn">
-                <label class="label" for="key-input">4th step: enter your key or <a style="color: blue">generate one</a></label>
-                <input type="text" id="key-input" class="input-field form-input" placeholder="type your key here"
-                       name="key" required>
+                <div id="key-field" {% if not is_filled %} class="hidden" {% endif %}>
+                    <label class="label" for="key-input">4th step: enter your key or <a style="color: blue">generate one</a></label>
+                    <input onchange="appear('submit-field')" type="text" id="key-input" class="input-field form-input"
+                           placeholder="type your key here" name="key" required>
+                </div>
+                {% if "keyError" in error_messages %}
+                    <p class="error">Error: key invalid</p>
+                {% endif %}
             </div>
 
             <div class="small-btn">
-                <label for="submit" class="label">Last step: submit</label>
-                <input type="submit" value="Confirm" id="submit" class="input-field form-input">
+                <div id="submit-field" {% if not is_filled %} class="hidden" {% endif %}>
+                    <label for="submit" class="label">Last step: submit</label>
+                    <input onclick="appear('download-field')" type="submit" value="Confirm" id="submit"
+                           class="input-field form-input">
+                </div>
             </div>
 
             <a href="/download" class="small-btn" style="text-decoration: none">
-                <label for="download" class="label">It's done !</label>
-                <input type="button" value="Download" id="download" class="input-field form-input">
+                <div id="download-field" {% if not is_filled %} class="hidden" {% endif %}>
+                    <label for="download" class="label">It's done !</label>
+                    <input type="button" value="Download" id="download" class="input-field form-input">
+                </div>
             </a>
         </form>
 
         <div class="end">
             <p class="info-text">For more information, take a look at our
-                <a href="/information_page" style="color: blue">information page</a></p>
+                <a href="/information_page" style="color: blue; text-decoration: none">information page</a>
+            </p>
         </div>
     </div>
+    <script src="../static/generate_key.js"></script>
+    <script src="../static/script.js"></script>
 </body>
 </html>
