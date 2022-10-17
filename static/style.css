@@ -13,12 +13,12 @@
 
 @font-face {
     font-family: basicFont, sans-serif;
-    src: url("../static/Bw Modelica/otf/BwModelica-Black.otf");
+    src: url("BwModelica-Black.otf");
 }
 
 @font-face {
     font-family: basicFontBold, sans-serif;
-    src: url("../static/Bw Modelica/otf/BwModelica-Bold.otf");
+    src: url("BwModelica-Bold.otf");
 }
 
 body {
@@ -29,6 +29,23 @@ body {
     animation: gradientMovement 20s ease infinite;
     -moz-animation: gradientMovement 20s ease infinite;
     -webkit-animation: gradientMovement 20s ease infinite;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.animation {
+    animation: appear 500ms forwards;
+}
+
+@keyframes appear {
+    0% {
+        translate: 40px;
+    }
+    100% {
+        translate: 0;
+    }
 }
 
 .navbar {
@@ -89,14 +106,17 @@ body {
 
 .small-btn {
     width: 45%;
+    margin-bottom: 1.5rem;
 }
 
 .medium-btn {
     width: 100%;
+    margin-bottom: 1.5rem;
 }
 
 .big-btn {
     width: 100%;
+    margin-bottom: 1.5rem;
 }
 
 .label {
@@ -104,7 +124,6 @@ body {
 }
 
 .form-input {
-    margin-bottom: 1.5rem;
     height: 3rem;
     min-width: 100%;
     text-align: center;
@@ -188,14 +207,15 @@ a {
     text-underline: none;
 }
 
+.error {
+    color: red;
+    text-align: center;
+}
+
 @media (min-width: 800px) {
     .logo {
         height: 4em;
         width: 7em;
-    }
-
-    .form-input {
-        height: 4rem;
     }
 
     #file-input {
@@ -216,19 +236,23 @@ a {
 
     .small-btn {
         width: 25%;
+        height: 4rem;
+        margin-bottom: 5vh;
     }
 
     .medium-btn {
         width: 40%;
+        margin-bottom: 5vh;
     }
 
     .big-btn {
         width: 70%;
+        margin-bottom: 5vh;
     }
 
     .form-input {
-        margin-bottom: 5vh;
         font-size: large;
+        height: 4rem;
     }
 }
 
