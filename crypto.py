@@ -2,6 +2,7 @@ from __future__ import annotations
 import re
 from AES128 import encrypt_aes128, decrypt_aes128
 from Cesar import encrypt_cesar, decrypt_cesar
+from Vigenere import encrypt_vigenere, decrypt_vigenere
 
 
 def check_key(method: str, key: str) -> bool | str:
@@ -20,6 +21,9 @@ def check_key(method: str, key: str) -> bool | str:
     elif method == "cesar":
         # it has to be an integer
         return key.isdigit()
+
+    elif method == "vigenere":
+        return key.isalpha()
 
     # algorithm selection error
     else:
@@ -57,6 +61,9 @@ def crypto(action: str, method: str, key: str, filename: str, new_name: str, pat
             # call the cesar encryption function
             new = encrypt_cesar(key, text)
 
+        elif method == "vigenere":
+            new = encrypt_vigenere(key, text)
+
     # check if the user wants to decrypt
     elif action == "decrypt":
         # check if the user has chosen the aes128 algorithm
@@ -68,6 +75,9 @@ def crypto(action: str, method: str, key: str, filename: str, new_name: str, pat
         elif method == "cesar":
             # call the cesar decryption function
             new = decrypt_cesar(key, text)
+
+        elif method == "vigenere":
+            new = decrypt_vigenere(key, text)
 
     else:
         # action value error

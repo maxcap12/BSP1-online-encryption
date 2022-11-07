@@ -1,9 +1,12 @@
+# Flask documentation: https://flask.palletsprojects.com/en/latest/
+
 from __future__ import annotations
 from flask import Flask, render_template, request, redirect, url_for, send_file, session
 from werkzeug.utils import secure_filename
 import os
 from crypto import crypto, check_key
-from flask_login import current_user
+from flask_sqlalchemy import SQLAlchemy
+
 
 # initialisation of the app
 app = Flask(__name__)
@@ -18,13 +21,29 @@ app.config["UPLOAD_FOLDER"] = upload_path
 # set the maximum size for uploaded files
 app.config["MAX_CONTENT_LENGTH"] = max_size
 
-app.secret_key = "TEST"
-
+# secret key of the app (should hide it in the final version)
+app.secret_key = "f360afc809f0e2eeff15da041d703ff7eef519a5257e79d996c3b9e2bb59082c"
+# disable the permanent session
 app.config["Session_permanent"] = False
 
 # create the folder to save the uploaded files if it doesn't exist
 if not os.path.exists(upload_path):
     os.mkdir(upload_path)
+
+# Set up of the database
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.sqlite3"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
+
+class Users(db.Model):
+    _id = db.Column("id", db.Integer, primary_key=True)
+    idt = db.Column(db.String(120), unique=True, nullable=False)
+    pw = db.Column(db.String(80), unique=False, nullable=False)
+
+    def __init__(self, idt, pw):
+        self.email = idt
+        self.pw = pw
 
 
 @app.route("/")
@@ -43,8 +62,7 @@ def index() -> str:
         filled = session["filled"]
         session.pop("filled")
 
-    print(filled)
-    return render_template("index.html", error_messages=error, is_filled=filled)
+    return render_template("index.html", error_messages=error, is_filled=filled, signin=False)
 
 
 @app.route("/log_out")
@@ -68,9 +86,17 @@ def sign_in_page() -> str | Response:
         idt = request.form["id"]
         # get the password
         pw = request.form["pw"]
-        return redirect(url_for("index"))
 
-    return render_template("sign-in.html")
+        if Users.query.filter_by(idt=idt, pw=pw).first():
+            print("c bon")
+            session["idt"] = idt
+            return redirect(url_for("index"))
+
+        else:
+            print("c pas bon")
+            return render_template("sign-in.html", error=True)
+
+    return render_template("sign-in.html", error=False)
 
 
 @app.route("/sign_up", methods=["POST", "GET"])
@@ -85,9 +111,20 @@ def sign_up() -> str | Response:
         idt = request.form["id"]
         # get the password
         pw = request.form["pw"]
-        return redirect(url_for("index"))
+        print(idt, pw)
+        if Users.query.filter_by(idt=idt).first():
+            print("ca existe")
+            return render_template("sign_up.html", )
 
-    return render_template("sign-up.html")
+        else:
+            print("oe")
+            new_user = Users(idt, pw)
+            db.session.add(new_user)
+            db.session.commit()
+            session["idt"] = idt
+            return redirect(url_for("index"))
+
+    return render_template("sign-up.html", error=False)
 
 
 @app.route("/information_page")
@@ -169,5 +206,7 @@ def download() -> Responce:
 if __name__ == "__main__":
     # creation of the variable containing the new file name
     new_file_name = ""
+    #
+    db.create_all()
     # run the app
     app.run(debug=True)

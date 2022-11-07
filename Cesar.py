@@ -13,9 +13,14 @@ def encrypt_cesar(key: str, text: str) -> str:
         if not char.isalpha():
             encrypted += char
         else:
-            # encrypt letters with the key
-            asInt = ord(char) - ord('a') + int(key) % 26
-            encrypted += chr(asInt % 26 + ord('a'))
+            if char.isupper():
+                # encrypt letters with the key
+                asInt = ord(char) - ord('A') + int(key) % 26
+                encrypted += chr(asInt % 26 + ord('A'))
+            else:
+                # encrypt letters with the key
+                asInt = ord(char) - ord('a') + int(key) % 26
+                encrypted += chr(asInt % 26 + ord('a'))
 
     # return the encrypted text
     return encrypted
@@ -36,9 +41,14 @@ def decrypt_cesar(key: str, text: str):
         if not char.isalpha():
             decrypted += char
         else:
-            # decrypt the letter with the key
-            asInt = ord(char) - ord('a') - int(key) % 26
-            decrypted += chr(asInt % 26 + ord('a'))
+            if char.isupper():
+                # encrypt letters with the key
+                asInt = ord(char) - ord('A') - int(key) % 26
+                decrypted += chr(asInt % 26 + ord('A'))
+            else:
+                # decrypt the letter with the key
+                asInt = ord(char) - ord('a') - int(key) % 26
+                decrypted += chr(asInt % 26 + ord('a'))
 
     # return the decrypted text
     return decrypted
