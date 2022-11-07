@@ -10,7 +10,6 @@
 <body>
     <div class="navbar">
         <img class="logo" src="../static/logo1-black.png" alt="Online encryption">
-
         <div class="connection-field">
             {% if signin == False %}
                 <a href="/sign_in">
@@ -55,16 +54,19 @@
                 <div id="method-field" {% if not is_filled %} class="hidden" {% endif %}>
                     <label class="label"  for="method-input">3rd step: select the method</label>
                     <select onchange="appear('key-field')" id="method-input" class="input-field form-input" name="method" required>
-                        <option value="none" disabled selected> -- </option>
+                        <option value="invalid" disabled selected> -- </option>
                         <option value="aes128">AES 128</option>
                         <option value="cesar">Cesar</option>
+                        <option value="vigenere">Vigenère</option>
                     </select>
                 </div>
             </div>
 
             <div class="medium-btn">
                 <div id="key-field" {% if not is_filled %} class="hidden" {% endif %}>
-                    <label class="label" for="key-input">4th step: enter your key or <a style="color: blue">generate one</a></label>
+                    <label class="label" for="key-input">4th step: enter your key or
+                        <a id="generate_key" style="color: blue">generate one</a>
+                    </label>
                     <input onchange="appear('submit-field')" type="text" id="key-input" class="input-field form-input"
                            placeholder="type your key here" name="key" required>
                 </div>
@@ -81,12 +83,14 @@
                 </div>
             </div>
 
-            <a href="/download" class="small-btn" style="text-decoration: none">
-                <div id="download-field" {% if not is_filled %} class="hidden" {% endif %}>
+
+            <div id="download-field" class="small-btn {% if not is_filled %}hidden{% endif %}"  >
+                <a href="/download" style="text-decoration: none">
                     <label for="download" class="label">It's done !</label>
                     <input type="button" value="Download" id="download" class="input-field form-input">
-                </div>
-            </a>
+                </a>
+            </div>
+
         </form>
 
         <div class="end">
