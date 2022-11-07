@@ -41,7 +41,7 @@ body {
 
 @keyframes appear {
     0% {
-        translate: 40px;
+        translate: 40px ;
     }
     100% {
         translate: 0;
