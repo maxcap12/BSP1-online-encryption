@@ -42,7 +42,7 @@ class Users(db.Model):
     pw = db.Column(db.String(80), unique=False, nullable=False)
 
     def __init__(self, idt, pw):
-        self.email = idt
+        self.idt = idt
         self.pw = pw
 
 
@@ -54,6 +54,7 @@ def index() -> str:
     """
     error = []
     filled = False
+    sess = []
     if "error" in session:
         error = session["error"]
         session.pop("error")
@@ -62,7 +63,10 @@ def index() -> str:
         filled = session["filled"]
         session.pop("filled")
 
-    return render_template("index.html", error_messages=error, is_filled=filled, signin=False)
+    if "idt" in session:
+        sess = session
+
+    return render_template("index.html", error_messages=error, is_filled=filled, session=sess)
 
 
 @app.route("/log_out")
@@ -71,6 +75,7 @@ def log_out() -> Response:
     log out the user
     :return: index page
     """
+    session.clear()
     return redirect(url_for("index"))
 
 
@@ -88,12 +93,10 @@ def sign_in_page() -> str | Response:
         pw = request.form["pw"]
 
         if Users.query.filter_by(idt=idt, pw=pw).first():
-            print("c bon")
             session["idt"] = idt
             return redirect(url_for("index"))
 
         else:
-            print("c pas bon")
             return render_template("sign-in.html", error=True)
 
     return render_template("sign-in.html", error=False)
@@ -111,13 +114,11 @@ def sign_up() -> str | Response:
         idt = request.form["id"]
         # get the password
         pw = request.form["pw"]
-        print(idt, pw)
+
         if Users.query.filter_by(idt=idt).first():
-            print("ca existe")
-            return render_template("sign_up.html", )
+            return render_template("sign_up.html", error=True)
 
         else:
-            print("oe")
             new_user = Users(idt, pw)
             db.session.add(new_user)
             db.session.commit()
