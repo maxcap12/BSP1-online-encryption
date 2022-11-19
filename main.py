@@ -7,7 +7,6 @@ import os
 from crypto import crypto, check_key
 from flask_sqlalchemy import SQLAlchemy
 
-
 # initialisation of the app
 app = Flask(__name__)
 
@@ -31,7 +30,7 @@ if not os.path.exists(upload_path):
     os.mkdir(upload_path)
 
 # Set up of the database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.sqlite3"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.sqlite3"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
@@ -46,6 +45,18 @@ class Users(db.Model):
         self.pw = pw
 
 
+class Keys(db.Model):
+    _id = db.Column("id", db.Integer, primary_key=True)
+    user = db.Column(db.String(120), unique=False, nullable=False)
+    key_name = db.Column(db.String(120), unique=False, nullable=False)
+    key = db.Column(db.String(50), unique=False, nullable=False)
+
+    def __init__(self, user, key_name, key):
+        self.user = user
+        self.key_name = key_name
+        self.key = key
+
+
 @app.route("/")
 def index() -> str:
     """
@@ -54,7 +65,8 @@ def index() -> str:
     """
     error = []
     filled = False
-    sess = []
+    saved_keys = {}
+
     if "error" in session:
         error = session["error"]
         session.pop("error")
@@ -63,10 +75,18 @@ def index() -> str:
         filled = session["filled"]
         session.pop("filled")
 
-    if "idt" in session:
-        sess = session
+    if "dont_ask" not in session:
+        session["dont_ask"] = False
 
-    return render_template("index.html", error_messages=error, is_filled=filled, session=sess)
+    show_popup = False if "show_popup" not in session else session["show_popup"]
+    session["show_popup"] = False
+
+    if "idt" in session:
+        saved_keys = key_query(session["idt"])
+
+    sess = session
+
+    return render_template("index.html", error_messages=error, is_filled=filled, session=sess, keys=saved_keys, show=show_popup)
 
 
 @app.route("/log_out")
@@ -149,8 +169,14 @@ def upload() -> Response:
     # check if the user posted information
     if request.method == "POST":
         session["filled"] = True
-        # get the key
+        # get the key from the type key input
         key = request.form["key"]
+        # check if the variable is an empty string
+        if not key:
+            # if it is, get the value of the select key input
+            key = request.form["saved-key"]
+        # save the last key in the session in case the user wants to save it
+        session["last_key"] = key
         # get the encryption method
         method = request.form["method"]
 
@@ -178,7 +204,9 @@ def upload() -> Response:
 
         # delete the orignal file from the server
         os.remove(os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename)))
-        return redirect(url_for("index"))
+
+        if "idt" in session:
+            session["show_popup"] = True
 
     return redirect(url_for("index"))
 
@@ -202,6 +230,48 @@ def download() -> Responce:
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], new_file_name))
     # download the new file on the client's device
     return download_file
+
+
+@app.route("/add-key", methods=["POST", "GET"])
+def add_key() -> Response:
+    if request.method == "POST":
+        try:
+            temp = request.form["cbox"]
+            session["dont_ask"] = True
+        # if the checkbox is not checked, it raises and error, so we ignore this error
+        except:
+            pass
+
+        key_name = request.form["key-name"] if request.form["key-name"] != '' else "key " + session["last_key"]
+        save_key(session["idt"], key_name, session["last_key"])
+        session["filled"] = True
+    return redirect(url_for("index"))
+
+
+@app.route("/dont-save", methods=["POST", "GET"])
+def dont_save() -> Response:
+    session.pop("last_key")
+    session["filled"] = True
+    return redirect(url_for("index"))
+
+
+@app.route("/stop-ask")
+def stop_ask() -> Response:
+    session.pop("last_key")
+    session["dont_ask"] = True
+    session["filled"] = True
+    return redirect(url_for("index"))
+
+
+def key_query(username: str) -> list:
+    data = Keys.query.filter_by(user=username).all()
+    return [[element.key_name, element.key] for element in data]
+
+
+def save_key(username: str, key_name: str, key: str) -> None:
+    new_key = Keys(username, key_name, key)
+    db.session.add(new_key)
+    db.session.commit()
 
 
 if __name__ == "__main__":
