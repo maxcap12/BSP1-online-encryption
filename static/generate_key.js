@@ -1,4 +1,4 @@
-document.getElementById("generate_key").onclick = function generate_key() {
+function generate_key() {
     let method = document.getElementById("method-input").value;
     let keyField = document.getElementById("key-input");
 
