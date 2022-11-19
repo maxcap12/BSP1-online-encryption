@@ -11,14 +11,14 @@
     <div class="navbar">
         <img class="logo" src="../static/logo1-black.png" alt="Online encryption">
         <div class="connection-field">
-            {% if signin == False %}
+            {% if not "idt" in session %}
                 <a href="/sign_in">
                     <button type="button" class="input-field connect-btn">Sign in</button>
                 </a>
                 <a href="/sign_up">
                     <button type="button" class="input-field connect-btn">Sign up</button>
                 </a>
-            {% elif signin == True %}
+            {% else %}
                 <a href="/log_out">
                     <button type="button" class="input-field connect-btn">Log out</button>
                 </a>
@@ -26,6 +26,22 @@
         </div>
     </div>
     <div class="content">
+        <div id="popup" class="popup" {% if session['dont_ask'] or not show %} style="display: none" {% endif %}>
+            <form class="popup-form" action="http://127.0.0.1:5000/add-key" method="POST">
+                <h2 id="popup-title">Do you want to save this key ?</h2>
+                <label for="key-name">key name: </label>
+                <input type="text" id="key-name" name="key-name">
+                <div class="block">
+                    <button onclick="hidePopup()" class="popup-btn" type="submit">save</button>
+                    <a href="/dont-save">
+                        <button onclick="hidePopup()" class="popup-btn" type="button">don't save</button>
+                    </a>
+                    <a href="/stop-ask">
+                        <button onclick="hidePopup()" class="popup-btn" type="button">stop asking</button>
+                    </a>
+                </div>
+            </form>
+        </div>
         <div class="motto-container">
             <div class="motto">Protect all your documents, and for free !</div>
         </div>
@@ -63,13 +79,37 @@
             </div>
 
             <div class="medium-btn">
-                <div id="key-field" {% if not is_filled %} class="hidden" {% endif %}>
-                    <label class="label" for="key-input">4th step: enter your key or
-                        <a id="generate_key" style="color: blue">generate one</a>
+                <div id="key-field" class="{% if not is_filled %}hidden{% else %}animation{% endif %}">
+                    <label class="label" for="key-input">4th step: enter a key
+                        {% if not "idt" in session %}
+                         or
+                        {% else %}
+                        , 
+                        {% endif %}
+                        <a onclick="generate_key()" style="color: blue">generate one</a>
+                        {% if "idt" in session %}
+                        or
+                        <a onclick="appearSavedKeys()" id="show_saved_keys1" style="color: blue">  select a saved one</a>
+                        {% endif %}
                     </label>
+
                     <input onchange="appear('submit-field')" type="text" id="key-input" class="input-field form-input"
-                           placeholder="type your key here" name="key" required>
+                           placeholder="type your key here" name="key">
                 </div>
+
+                <div id="saved-keys" class="disappear">
+                    <label class="label" for="select-saved-keys">4th step: select a key or
+                        <a onclick="appearSavedKeys()" style="color: blue">  type one</a>
+                    </label>
+
+                    <select name="saved-key" id="select-saved-keys" class="input-field form-input" onchange="appear('submit-field')">
+                        <option value="invalid" selected disabled>--</option>
+                        {% for key in keys %}
+                        <option value="{{key[1]}}">{{key[0]}}</option>
+                        {% endfor %}}
+                    </select>
+                </div>
+
                 {% if "keyError" in error_messages %}
                     <p class="error">Error: key invalid</p>
                 {% endif %}
@@ -78,11 +118,10 @@
             <div class="small-btn">
                 <div id="submit-field" {% if not is_filled %} class="hidden" {% endif %}>
                     <label for="submit" class="label">Last step: submit</label>
-                    <input onclick="appear('download-field')" type="submit" value="Confirm" id="submit"
+                    <input onclick="appear('download-field'); showPopup()" type="submit" value="Confirm" id="submit"
                            class="input-field form-input">
                 </div>
             </div>
-
 
             <div id="download-field" class="small-btn {% if not is_filled %}hidden{% endif %}"  >
                 <a href="/download" style="text-decoration: none">
@@ -90,7 +129,6 @@
                     <input type="button" value="Download" id="download" class="input-field form-input">
                 </a>
             </div>
-
         </form>
 
         <div class="end">
