@@ -56,10 +56,11 @@ body {
 
 .block {
     display: flex;
-    gap: 2%;
+    justify-content: space-around;
     padding-top: 5%;
     align-items: center;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .sub-block {
@@ -68,8 +69,13 @@ body {
     gap: 0.5vw;
 }
 
+.popup-field {
+    min-width: 30%;
+}
+
 .popup-btn {
-    padding: 0.8vh 0.8vw;
+    width: 90%;
+    padding-block: 0.2vh;
 }
 
 .hidden {
@@ -255,6 +261,31 @@ a {
 .error {
     color: red;
     text-align: center;
+}
+
+.section {
+    font-size: min(5vw, 30px);
+    padding-block: min(1.5rem, 2.5%);
+}
+
+.subsection {
+    font-size: min(4vw, 20px);
+    padding-block: min(1rem, 2%);
+}
+
+.text {
+    margin-bottom: min(1.5rem, 2.5%);
+    padding-right: 5vw;
+}
+
+.list {
+    margin-left: 3%;
+    margin-bottom: 2vh;
+}
+
+.go-back-index {
+    display: flex;
+    text-decoration: none;
 }
 
 @media (min-width: 800px) {
