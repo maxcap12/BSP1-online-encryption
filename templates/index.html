@@ -26,17 +26,19 @@
         </div>
     </div>
     <div class="content">
-        <div id="popup" class="popup" {% if session['dont_ask'] or not show %} style="display: none" {% endif %}>
+        <div id="popup" class="popup" {% if session['dont_ask'] or not show %}  {% endif %}>
             <form class="popup-form" action="http://127.0.0.1:5000/add-key" method="POST">
                 <h2 id="popup-title">Do you want to save this key ?</h2>
                 <label for="key-name">key name: </label>
                 <input type="text" id="key-name" name="key-name">
                 <div class="block">
-                    <button onclick="hidePopup()" class="popup-btn" type="submit">save</button>
-                    <a href="/dont-save">
+                    <div class="popup-field">
+                        <button onclick="hidePopup()" class="popup-btn" type="submit">save</button>
+                    </div>
+                    <a href="/dont-save" class="popup-field">
                         <button onclick="hidePopup()" class="popup-btn" type="button">don't save</button>
                     </a>
-                    <a href="/stop-ask">
+                    <a href="/stop-ask" class="popup-field">
                         <button onclick="hidePopup()" class="popup-btn" type="button">stop asking</button>
                     </a>
                 </div>
@@ -72,7 +74,7 @@
                     <select onchange="appear('key-field')" id="method-input" class="input-field form-input" name="method" required>
                         <option value="invalid" disabled selected> -- </option>
                         <option value="aes128">AES 128</option>
-                        <option value="cesar">Cesar</option>
+                        <option value="caesar">Caesar</option>
                         <option value="vigenere">Vigenère</option>
                     </select>
                 </div>
@@ -89,7 +91,7 @@
                         <a onclick="generate_key()" style="color: blue">generate one</a>
                         {% if "idt" in session %}
                         or
-                        <a onclick="appearSavedKeys()" id="show_saved_keys1" style="color: blue">  select a saved one</a>
+                        <a onclick="appearSavedKeys()" id="show_saved_keys1" style="color: blue"> select a saved one</a>
                         {% endif %}
                     </label>
 

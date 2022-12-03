@@ -6,6 +6,65 @@
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <h1>INFO</h1>
+    <div class="navbar">
+        <img class="logo" src="../static/logo1-black.png" alt="Online encryption">
+        <div class="connection-field">
+            {% if not "idt" in session %}
+                <a href="/sign_in">
+                    <button type="button" class="input-field connect-btn">Sign in</button>
+                </a>
+                <a href="/sign_up">
+                    <button type="button" class="input-field connect-btn">Sign up</button>
+                </a>
+            {% else %}
+                <a href="/log_out">
+                    <button type="button" class="input-field connect-btn">Log out</button>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="content">
+        <a href="/" class="go-back-index">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-left" viewBox="0 0 16 16">
+                <path d="M10 12.796V3.204L4.519 8 10 12.796zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/>
+            </svg>
+            <h4>index page</h4>
+        </a>
+        <h1 class="motto">Information page</h1>
+
+        <h3 class="section">Description of the algorithms used</h3>
+
+        <h4 class="subsection">1. Caesar</h4>
+        <p class="text">The caesar encryption is an ancient cryptography algorithm. It shifts each letter of the cipher text to the right
+            a certain number of times, determined by the value of the key, which is an integer. To decrypt we simply need to
+            shift each letter of the cipher text to the left the same number of times.</p>
+
+        <h4 class="subsection">2. Vigenere</h4>
+        <p class="text">The vigenere encryption can be compared to the caesar encryption, but more complex. The key is multiple letters.
+            It shifts each letter of the right by a certain number of times, determined by the position in the alphabet of
+            the letter at the corresponding index in the key. For exemple, if we want to encrypt "vigenere" with the key
+            "abc", we shift the letter 'v' by 1 time to the right, then the letter 'i' by 2 times, the letter 'g' by 3 times,
+            the letter 'e' by 1 time, and so on. To decrypt we do the inverse process.</p>
+
+        <h4 class="subsection">3. AES 128</h4>
+        <p class="text">The AES 128 encryption algorithm is divided in 10 rounds. It uses keys of 128 bits, 32 hexadecimal characters for
+            this website The text is divided in blocks of 16 characters, and we apply to it 4 different operations :</p>
+            <ul class="list">
+                <li class="list-el">Sub bytes</li>
+                <li class="list-el">Shift rows</li>
+                <li class="list-el">Mix columns</li>
+                <li class="list-el">Xor round key</li>
+            </ul>
+        <p class="text">Each of these operations are reversible, so we can decrypt the cipher text with the key.</p>
+
+        <h3 class="section">Why you should create an account ?</h3>
+        <p>Creating an account allows you to save all the key you use and to use them later, to decrypt a file that you
+            have previously encrypted for example.</p>
+
+        <h3 class="section">About me</h3>
+        <p>I am Maxime Capdouze, a first year BiCS student at the University of Luxembourg. <br>
+            This website has been created for my first bachelor semester project, which is related to cryptography.</p>
+    </div>
+    <br><br><br><br>
 </body>
 </html>
