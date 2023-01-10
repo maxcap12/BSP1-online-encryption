@@ -1,11 +1,15 @@
 # Flask documentation: https://flask.palletsprojects.com/en/latest/
-
 from __future__ import annotations
-from flask import Flask, render_template, request, redirect, url_for, send_file, session
-from werkzeug.utils import secure_filename
-import os
-from crypto import crypto, check_key
-from flask_sqlalchemy import SQLAlchemy
+
+try:
+    from flask import Flask, render_template, request, redirect, url_for, send_file, session
+    from werkzeug.utils import secure_filename
+    import os
+    from crypto import crypto, check_key
+    from flask_sqlalchemy import SQLAlchemy
+except ImportError:
+    raise ImportError("Please install the needed libraries")
+
 
 # initialisation of the app
 app = Flask(__name__)
@@ -36,8 +40,14 @@ db = SQLAlchemy(app)
 
 
 class Users(db.Model):
+    """
+    Object representing a row of the users’ table to store user accounts information
+    """
+    # column for the primary key
     _id = db.Column("id", db.Integer, primary_key=True)
+    # column to store the username
     idt = db.Column(db.String(120), unique=True, nullable=False)
+    # column to store the password
     pw = db.Column(db.String(80), unique=False, nullable=False)
 
     def __init__(self, idt, pw):
@@ -46,9 +56,16 @@ class Users(db.Model):
 
 
 class Keys(db.Model):
+    """
+    Object representing a column of the keys' table to store the keys saved by the users
+    """
+    # column for the primary key
     _id = db.Column("id", db.Integer, primary_key=True)
+    # column to store the username
     user = db.Column(db.String(120), unique=False, nullable=False)
+    # column to store the description of the key
     key_name = db.Column(db.String(120), unique=False, nullable=False)
+    # column to store the key
     key = db.Column(db.String(50), unique=False, nullable=False)
 
     def __init__(self, user, key_name, key):
@@ -63,25 +80,35 @@ def index() -> str:
     display the index page of the website
     :return: index page
     """
+    # initialise the variables
     error = []
     filled = False
     saved_keys = {}
 
     if "error" in session:
+        # get the error if any
         error = session["error"]
+        # reset the error field of the session
         session.pop("error")
 
     if "filled" in session:
+        # check if the form has already been filled
         filled = session["filled"]
+        # reset the field
         session.pop("filled")
 
     if "dont_ask" not in session:
+        # check if the user clicked on the stop asking button
         session["dont_ask"] = False
 
+    # check if we are supposed to show the popup or not
     show_popup = False if "show_popup" not in session else session["show_popup"]
+    # reset the field
     session["show_popup"] = False
 
+    # check if the user is logged in
     if "idt" in session:
+        # get all the keys saved by the user
         saved_keys = key_query(session["idt"])
 
     sess = session
@@ -95,6 +122,7 @@ def log_out() -> Response:
     log out the user
     :return: index page
     """
+    # log out the user
     session.clear()
     return redirect(url_for("index"))
 
@@ -111,8 +139,11 @@ def sign_in_page() -> str | Response:
         idt = request.form["id"]
         # get the password
         pw = request.form["pw"]
+        hash_pw = hash(pw)
 
-        if Users.query.filter_by(idt=idt, pw=pw).first():
+        # check if the username and the password are valid
+        if Users.query.filter_by(idt=idt, pw=hash_pw).first():
+            # save the username in the session
             session["idt"] = idt
             return redirect(url_for("index"))
 
@@ -135,13 +166,20 @@ def sign_up() -> str | Response:
         # get the password
         pw = request.form["pw"]
 
+        # check if the username is not already used by another account
         if Users.query.filter_by(idt=idt).first():
-            return render_template("sign_up.html", error=True)
+            return render_template("sign-up.html", error=True)
 
         else:
-            new_user = Users(idt, pw)
+            # hash the password
+            hash_pw = hash(pw)
+            # create the column
+            new_user = Users(idt, hash_pw)
+            # place the column in the users table
             db.session.add(new_user)
+            # save the database
             db.session.commit()
+            # save the username in the session
             session["idt"] = idt
             return redirect(url_for("index"))
 
@@ -171,10 +209,17 @@ def upload() -> Response:
         session["filled"] = True
         # get the key from the type key input
         key = request.form["key"]
+        # check if the user is logged in
+        if "idt" in session:
+            session["show_popup"] = True
+
         # check if the variable is an empty string
         if not key:
             # if it is, get the value of the select key input
             key = request.form["saved-key"]
+            # the user has selected a key which is already saved, so the popup doesn't appear
+            session["show_popup"] = False
+
         # save the last key in the session in case the user wants to save it
         session["last_key"] = key
         # get the encryption method
@@ -190,7 +235,7 @@ def upload() -> Response:
         action = request.form["action"]
         # get the file
         file = request.files["file"]
-        # download the file on the server
+        # download the file in the local folder
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename)))
 
         # save the path to the new file in the global variable
@@ -204,9 +249,6 @@ def upload() -> Response:
 
         # delete the orignal file from the server
         os.remove(os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename)))
-
-        if "idt" in session:
-            session["show_popup"] = True
 
     return redirect(url_for("index"))
 
@@ -228,28 +270,31 @@ def download() -> Responce:
     download_file = send_file(app.config["UPLOAD_FOLDER"] + '/' + new_file_name, as_attachment=True)
     # delete the ew file from the server
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], new_file_name))
-    # download the new file on the client's device
+    # download the new file on the user's device
     return download_file
 
 
 @app.route("/add-key", methods=["POST", "GET"])
 def add_key() -> Response:
-    if request.method == "POST":
-        try:
-            temp = request.form["cbox"]
-            session["dont_ask"] = True
-        # if the checkbox is not checked, it raises and error, so we ignore this error
-        except:
-            pass
-
-        key_name = request.form["key-name"] if request.form["key-name"] != '' else "key " + session["last_key"]
-        save_key(session["idt"], key_name, session["last_key"])
-        session["filled"] = True
+    """
+    called when the user press the "save" button on the popup
+    :return: index page
+    """
+    # get the value of the input field, if it is empty, assign a default name to the key
+    key_name = request.form["key-name"] if request.form["key-name"] != '' else "key " + session["last_key"]
+    # call the function to save the key in the database
+    save_key(session["idt"], key_name, session["last_key"])
+    session["filled"] = True
     return redirect(url_for("index"))
 
 
 @app.route("/dont-save", methods=["POST", "GET"])
 def dont_save() -> Response:
+    """
+    called when the user press the "don't save" button on the popup
+    :return: index page
+    """
+    # delete the key from the session
     session.pop("last_key")
     session["filled"] = True
     return redirect(url_for("index"))
@@ -257,19 +302,40 @@ def dont_save() -> Response:
 
 @app.route("/stop-ask")
 def stop_ask() -> Response:
+    """
+    called when the user press the "stop asking" button on the popup
+    :return: index page
+    """
+    # delete the key from the session
     session.pop("last_key")
+    # now the popup is no longer shown
     session["dont_ask"] = True
     session["filled"] = True
     return redirect(url_for("index"))
 
 
 def key_query(username: str) -> list:
+    """
+    get all the key saved by a user
+    :param username: name of the account of the user
+    :return: a list of lists containing the description of the key and its value
+    """
+    # get all keys saved by the user
     data = Keys.query.filter_by(user=username).all()
     return [[element.key_name, element.key] for element in data]
 
 
 def save_key(username: str, key_name: str, key: str) -> None:
+    """
+    save a key in the database
+    :param username: name of the account of the user
+    :param key_name: name of the key
+    :param key: value of the key
+    :return: None
+    """
+    # create the key object
     new_key = Keys(username, key_name, key)
+    # add the object to the database
     db.session.add(new_key)
     db.session.commit()
 
@@ -277,7 +343,7 @@ def save_key(username: str, key_name: str, key: str) -> None:
 if __name__ == "__main__":
     # creation of the variable containing the new file name
     new_file_name = ""
-    #
+    # create the database
     db.create_all()
     # run the app
     app.run(debug=True)

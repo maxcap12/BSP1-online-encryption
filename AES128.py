@@ -54,7 +54,7 @@ def breakIntoBlock(text: str) -> list:
     break a text into square matrices with 1 character of the for each entry, if the length of the text is not a
     multiple of the 16 variable, the missing values of the last block are replaced by spaces
     :param text: text to break
-    :return:
+    :return: list of 4 lists
     """
     # creation of the matrix
     blocks = []
@@ -73,68 +73,134 @@ def breakIntoBlock(text: str) -> list:
 
 
 def breakKey(key: str) -> list:
+    """
+    break a key into square matrix with 2 hexadecimal characters for each entry
+    :param key: key to break
+    :return: list of 4 lists
+    """
+    # creation of the matrix
     keyBlock = []
+
     for i in range(4):
+        # creation of the column of the matrix
         keyBlock.append([])
         for j in range(4):
+            # add the values of the j th column of the key in the j th column of the matrix
             keyBlock[-1].append(int(key[i * 8 + j * 2:i * 8 + j * 2 + 2], 16))
     return [keyBlock]
 
 
 def mergeBlocks(blocks: list) -> str:
+    """
+    merge a list of matrices into a text
+    :param blocks: blocks to merge
+    :return: string containing all the text
+    """
+    # initialisation of the text
     text = ""
+    # loop through the list of matrices
     for block in blocks:
+        # loop through the matrix
         for row in block:
+            # loop through the row of the matrix
             for char in row:
+                # add the entry to the variable containing the text
                 text += chr(char)
 
     return text
 
 
 def subBytes(block: list) -> list:
+    """
+    substitute each entry of a matrix by its corresponding value of the sBox
+    :param block: matrix to substitue
+    :return: new matrix with the substituted entries
+    """
+    # creation of the new matrix
     newBlock = []
 
+    # loop through the rows of the matrix
     for row in block:
+        # creation of the row of the new matrix
         newBlock.append([])
+        # loop through the entries of the row
         for char in row:
+            # add the substituted value to the new matrix
             newBlock[-1].append(sBox[char])
 
     return newBlock
 
 
 def invSubBytes(block: list) -> list:
+    """
+    get the entries of the initial matrix from the substituted ones
+    :param block: block containing the substituted values
+    :return: initial matrix
+    """
+    # creation of the new matrix
     newBlock = []
 
+    # loop through the rows of the matrix
     for row in block:
+        # creation of the row of the new matrix
         newBlock.append([])
+        # loo through the entries of the row
         for char in row:
+            # add the initial value to the new matrix
             newBlock[-1].append(sBoxInv[char])
 
     return newBlock
 
 
 def shiftRowsBlock(block: list) -> list:
+    """
+    shift each rows of a matrix  to the left by a certain number of times
+    :param block: matrix to shift
+    :return: new matrix with the rows shifted
+    """
+    # loop through the rows of the matrix
     for i in range(len(block)):
+        # shift the i th row to the left i times
         block[i] = shiftRows(block[i], i)
 
     return block
 
 
 def invShiftRowsBloc(block: list) -> list:
+    """
+    shift each rows of a matrix  to the right by a certain number of times
+    :param block: matrix to shift
+    :return: new matrix with the rows shifted
+    """
+    # loop through the rows of the matrix
     for i in range(len(block)):
+        # shift the i th row to the right i times, which corresponds to -i times to the left
         block[i] = shiftRows(block[i], -i)
 
     return block
 
 
 def shiftRows(row: list, n: int) -> list:
+    """
+    shift the values of the list n times to the left
+    :param row: row to shift
+    :param n: number of times to shift the row
+    :return: shifted list
+    """
     return row[n:] + row[:n]
 
 
 def mixColumns(block: list) -> list:
+    """
+    multiply the matrix by a fixed one in a finite field
+    :param block: matrix to multiply
+    :return: new matrix
+    """
+    # creation of the new matrix
     newBlock = [[] for _ in range(4)]
 
     for i in range(4):
+        # multiply each entry of the 2 matrices
         newBlock[0].append(multiplyBy3(block[3][i]) ^ multiplyBy2(block[0][i]) ^ block[1][i] ^ block[2][i])
         newBlock[1].append(multiplyBy3(block[0][i]) ^ multiplyBy2(block[1][i]) ^ block[2][i] ^ block[3][i])
         newBlock[2].append(multiplyBy3(block[1][i]) ^ multiplyBy2(block[2][i]) ^ block[3][i] ^ block[0][i])
@@ -144,19 +210,30 @@ def mixColumns(block: list) -> list:
 
 
 def invMixColumns(block: list) -> list:
+    """
+    inverse of the previous function, get the initial matrix from the one resulting of the multiplication
+    the initial matrix is obtained by multiplying the obtained one by the fixed one 3 times
+    :param block: matrix obtained by the multiplication
+    :return: initial matrix
+    """
     return mixColumns(mixColumns(mixColumns(block)))
 
 
 def multiplyBy2(val: int) -> int:
     """
-
-    :param val:
-    :return:
+    multiply a value by 2 in a finite field
+    :param val: value to multiply
+    :return: result of the multiplication
     """
+    # shift the bits by one to the left (= multiply by 2)
     newVal = val << 1
+    # reduce the result to 255 if its bigger
     newVal &= 0xff
 
+    # check if the original value is smaller than 128,
+    # so the result of the multiplication is smaller than 256 and can be contained in a byte
     if val >> 7 != 0:
+        # else xor it by 27
         newVal ^= 0x1b
 
     return newVal
@@ -164,14 +241,20 @@ def multiplyBy2(val: int) -> int:
 
 def multiplyBy3(val: int) -> int:
     """
-
-    :param val:
-    :return:
+    multiply a value by 3 in a finite field
+    :param val: value to multiply
+    :return: result of the multiplication
     """
     return multiplyBy2(val) ^ val
 
 
 def xorRoundKey(block: list, key: list) -> list:
+    """
+    xor each entry of 2 matrices
+    :param block: matrix representing the text to encrypt/decrypt
+    :param key: matrix representing the key
+    :return: new matrix containing the new values
+    """
     for i in range(4):
         for j in range(4):
             block[i][j] ^= key[i][j]
@@ -180,13 +263,25 @@ def xorRoundKey(block: list, key: list) -> list:
 
 
 def roundKeys(key: str, rounds: int) -> list:
+    """
+    generate multiple keys from one
+    :param key: initial key
+    :param rounds: number of keys to generate
+    :return: list of matrices representing the keys
+    """
+    # break of the initial key into a matrix
     keys = breakKey(key)
 
     for r in range(rounds):
         newKey = [[], [], [], []]
+        # get the 4th column of the last key
         lastColumn = [k[-1] for k in keys[-1]]
+        # shift its rows
         lastColumnRotate = shiftRows(lastColumn, 1)
+        # replace the values by the corresponding values of the sBox
         lastColumnSBox = [sBox[b] for b in lastColumnRotate]
+        # xor the values with the values of the previous column and
+        # the values of the column of the same index in the previous key
         lastColumnRcon = [lastColumnSBox[i] ^ rcon[r][i] ^ keys[-1][i][0] for i in range(4)]
 
         for i in range(4):
@@ -194,6 +289,7 @@ def roundKeys(key: str, rounds: int) -> list:
 
         for i in range(3):
             for j in range(4):
+                # xor the values with the values of the previous column
                 lastColumnRcon[j] ^= keys[-1][j][i + 1]
                 newKey[j].append(lastColumnRcon[j])
 
@@ -203,9 +299,18 @@ def roundKeys(key: str, rounds: int) -> list:
 
 
 def encrypt_aes128(key: str, text: str) -> str:
+    """
+    encrypt a plain text using the AES 128 algorithm
+    :param key: 32 hexadecimal characters key
+    :param text: plain text
+    :return: cipher text
+    """
+    # generate 10 keys
     keys = roundKeys(key, 10)
+    # break the text into blocks
     textBlock = breakIntoBlock(text)
 
+    # perform the initial round, the 8 main rounds, and the final one on each block
     for block in textBlock:
         block = xorRoundKey(block, keys[0])
 
@@ -223,9 +328,18 @@ def encrypt_aes128(key: str, text: str) -> str:
 
 
 def decrypt_aes128(key: str, text: str) -> str:
+    """
+    decrypt a cipher text using the AES 128 algorithm
+    :param key: 32 hexadecimal characters key
+    :param text: cipher text
+    :return: plain text
+    """
+    # generate 10 keys
     keys = roundKeys(key, 10)
+    # break the text into blocks
     textBlock = breakIntoBlock(text)
 
+    # perform the initial round, the 8 main rounds, and the final one on each block
     for block in textBlock:
         block = xorRoundKey(block, keys[0])
         block = invSubBytes(block)

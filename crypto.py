@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 from AES128 import encrypt_aes128, decrypt_aes128
-from Cesar import encrypt_cesar, decrypt_cesar
+from Caesar import encrypt_caesar, decrypt_caesar
 from Vigenere import encrypt_vigenere, decrypt_vigenere
 
 
@@ -17,8 +17,8 @@ def check_key(method: str, key: str) -> bool | str:
         # it has to be a key of 128 bits in hexadecimal, so 32 hexadecimal characters
         return re.search("[^0-9a-fA-F]", key) is None and len(key) == 32
 
-    # check for cesar encryption algorithm
-    elif method == "cesar":
+    # check for Caesar encryption algorithm
+    elif method == "caesar":
         # it has to be an integer
         return key.isdigit()
 
@@ -56,10 +56,10 @@ def crypto(action: str, method: str, key: str, filename: str, new_name: str, pat
             # call the aes128 encryption function
             new = encrypt_aes128(key, text)
 
-        # check if the user has chosen the cesar algorithm
-        elif method == "cesar":
-            # call the cesar encryption function
-            new = encrypt_cesar(key, text)
+        # check if the user has chosen the caesar algorithm
+        elif method == "caesar":
+            # call the caesar encryption function
+            new = encrypt_caesar(key, text)
 
         elif method == "vigenere":
             new = encrypt_vigenere(key, text)
@@ -71,10 +71,10 @@ def crypto(action: str, method: str, key: str, filename: str, new_name: str, pat
             # call the aes128 decryption method
             new = decrypt_aes128(key, text)
 
-        # check if the user has chosen the cesar algorithm
-        elif method == "cesar":
-            # call the cesar decryption function
-            new = decrypt_cesar(key, text)
+        # check if the user has chosen the caesar algorithm
+        elif method == "caesar":
+            # call the caesar decryption function
+            new = decrypt_caesar(key, text)
 
         elif method == "vigenere":
             new = decrypt_vigenere(key, text)
