@@ -8,7 +8,8 @@ try:
     from crypto import crypto, check_key
     from flask_sqlalchemy import SQLAlchemy
 except ImportError:
-    raise ImportError("Please install the needed libraries")
+    raise ImportError("Please install the needed libraries, "
+                      "consult https://github.com/maxcap12/BSP1-online-encryption/blob/main/requirements.txt")
 
 
 # initialisation of the app
