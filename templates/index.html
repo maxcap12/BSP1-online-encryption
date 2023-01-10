@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="content">
-        <div id="popup" class="popup" {% if session['dont_ask'] or not show %}  {% endif %}>
+        <div id="popup" class="popup" {% if session['dont_ask'] or not show %} style="display: none" {% endif %}>
             <form class="popup-form" action="http://127.0.0.1:5000/add-key" method="POST">
                 <h2 id="popup-title">Do you want to save this key ?</h2>
                 <label for="key-name">key name: </label>
