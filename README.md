@@ -10,6 +10,8 @@ Libraries requirements:
    https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/
 3. Werkzeug (this library should be automatically installed with Flask): pip install -U Werkzeug (recommanded version: 2.0.1)
    https://werkzeug.palletsprojects.com/en/2.2.x/
+4. Jinja2 (this library should be automatically installed with Flask): pip install -U Jinja2 (recommanded version: 3.1.2)
+   https://jinja.palletsprojects.com/en/3.1.x/
 
 How to run the program:
 
